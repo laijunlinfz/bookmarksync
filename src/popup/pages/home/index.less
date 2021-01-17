@@ -1,0 +1,24 @@
+@defaultWidth: 90%;
+@btnWidht: 48%;
+
+.home-contaner {
+  width: 375px;
+  // width: 100%;
+  .account {
+    margin: 20px auto 0 auto;
+    font-size: 24px;
+    width: @defaultWidth;
+  }
+  .button {
+    margin: 20px auto;
+    display: flex;
+    justify-content: space-between;
+    width: @defaultWidth;
+    .logout-btn {
+      width: @btnWidht;
+    }
+    .bookmark-btn {
+      width: @btnWidht;
+    }
+  }
+}
