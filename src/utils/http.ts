@@ -17,8 +17,7 @@ export const curl = async (
     keys.forEach((key) => {
       suffix += `&${key}=${params[key]}`;
     });
-    suffix.replace(/^&/, "?");
-    curUrl = url + suffix;
+    curUrl = url + suffix.replace(/^&/, "?");
   }
   const headers: Headers = {
     "Access-Token": getToken(),

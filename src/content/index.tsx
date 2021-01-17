@@ -8,11 +8,12 @@ import ReactDOM from "react-dom";
 import "./index.less";
 
 const Content: FC = () => {
-  return <div>123</div>;
+  // return <div>123</div>;
+  return <div></div>;
 };
 
 const app = document.createElement("div");
-app.id = "CRX-container";
+app.id = "content-container";
 document.body.appendChild(app);
 
 ReactDOM.render(<Content />, app);

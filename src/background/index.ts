@@ -1,4 +1,4 @@
-import { updateBookmark } from "@/api";
+import { uploadBookmark } from "@/api";
 import { getTree } from '@/utils/chromeUtils';
 // import myLocalStorage from "../utils/localStorageUtils";
 
@@ -49,7 +49,7 @@ import { getTree } from '@/utils/chromeUtils';
 
 const bookmarksChangeCallback = async(): Promise<void> => {
   const treeResult = await getTree();
-  updateBookmark(treeResult);
+  uploadBookmark(treeResult);
 };
 
 chrome.bookmarks.onChanged.addListener(bookmarksChangeCallback);
