@@ -12,7 +12,7 @@ export const curl = async (
   let curUrl = url;
   const keys = Object.keys(params);
 
-  if (keys.length > 0) {
+  if (method === Method.GET && keys.length > 0) {
     let suffix = "";
     keys.forEach((key) => {
       suffix += `&${key}=${params[key]}`;

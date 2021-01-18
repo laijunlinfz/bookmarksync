@@ -1,10 +1,21 @@
 import { uploadBookmark } from "@/api";
-import { getTree } from '@/utils/chromeUtils';
-// import myLocalStorage from "../utils/localStorageUtils";
+import { getTree } from "@/utils/chromeUtils";
+// import API from "@/api";
+// import { setToken, getToken } from "@/utils/localStorageUtils";
+// import { LoginDataRes } from "@/types/login";
 
-// setInterval(() => {
+// setInterval(async () => {
 //   console.log("background time ", Date.now());
-// }, 3000);
+//   const token = getToken();
+//   if (token) {
+//     const loginRes = await API.login("", "", token);
+//     const { data, code } = loginRes;
+//     if (code === 0) {
+//       const { token } = data as LoginDataRes;
+//       setToken(token);
+//     }
+//   }
+// }, 1000);
 
 /*global chrome*/
 // chrome.runtime.onInstalled.addListener(function () {
@@ -47,7 +58,7 @@ import { getTree } from '@/utils/chromeUtils';
 //   return true;
 // });
 
-const bookmarksChangeCallback = async(): Promise<void> => {
+const bookmarksChangeCallback = async (): Promise<void> => {
   const treeResult = await getTree();
   uploadBookmark(treeResult);
 };

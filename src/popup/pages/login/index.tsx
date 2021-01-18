@@ -4,8 +4,10 @@ import { History } from "history";
 import { InputItem, Button, Toast } from "antd-mobile";
 import { isEmail } from "@/utils";
 import API from "@/api";
-import "./index.less";
 import { MSG } from "@/constants";
+import { setToken } from "@/utils/localStorageUtils";
+import { LoginDataRes } from "@/types/login";
+import "./index.less";
 
 let TIME = 120;
 let INTERVAL: NodeJS.Timeout;
@@ -52,11 +54,20 @@ const Login: React.FC = () => {
     }
   };
 
-  const login = (): void => {
+  const login = async(): Promise<void> => {
     if (!canClickLoginBtn) {
       return;
     }
-    history.push("/home");
+    const loginRes = await API.login(email, code, '');
+    const { code: apiCode, msg, data } = loginRes || {};
+    if (apiCode === 0) {
+      const { token } = data as LoginDataRes;
+      // TODO update bookmark 不主动刷新
+      setToken(token);
+      history.push("/home");
+    } else {
+      Toast.show(msg || '登录异常');
+    }
   };
 
   const onEailChange = (value: string): void => {

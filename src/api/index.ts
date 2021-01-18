@@ -3,7 +3,7 @@
 import "@/mock";
 import { curl } from "@/utils/http";
 import { UpdateBookmarkRes, DownloadBookmarkRes } from "@/types/home";
-import { LoginRes, LogoutRes, CodeRes } from "@/types/login";
+import { LoginRes, CodeRes } from "@/types/login";
 
 // 登获取验证码
 export const getCode = (email: string): Promise<CodeRes> => {
@@ -12,33 +12,26 @@ export const getCode = (email: string): Promise<CodeRes> => {
 };
 
 // 登录接口
-export const login = (email: string, code: string): Promise<LoginRes> => {
-  const url = "/login";
-  return curl(url, { email, code });
-};
-
-// 登出接口
-export const logout = (token: string): Promise<LogoutRes> => {
-  const url = "/logout";
-  return curl(url, { token });
+export const login = (email: string, code: string, token: string): Promise<LoginRes> => {
+  const url = "/chrome/login";
+  return curl(url, { email, code, token });
 };
 
 // 上传书签数据
 export const uploadBookmark = (tree: any): Promise<UpdateBookmarkRes> => {
-  const url = "/bookmark/upload";
+  const url = "/chrome/bookmark/upload";
   return curl(url, { tree });
 };
 
 // 下载书签数据
 export const downloadBookmark = (): Promise<DownloadBookmarkRes> => {
-  const url = "/bookmark/download";
+  const url = "/chrome/bookmark/download";
   return curl(url);
 };
 
 export default {
   getCode,
   login,
-  logout,
   updateBookmark: uploadBookmark,
   downloadBookmark,
 };

@@ -1,15 +1,14 @@
 import { BaseRes } from "./index";
 
-interface LoginDataRes {
+export interface LoginDataRes {
   email: string;
   token: string;
+  bookmark: any;
 }
 
 export interface LoginRes extends BaseRes {
-  data: LoginDataRes;
+  data: LoginDataRes | string;
 }
-
-export type LogoutRes = BaseRes;
 
 export type CodeRes = BaseRes;
 
