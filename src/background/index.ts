@@ -17,47 +17,6 @@ import { getTree } from "@/utils/chromeUtils";
 //   }
 // }, 1000);
 
-/*global chrome*/
-// chrome.runtime.onInstalled.addListener(function () {
-//   chrome.declarativeContent.onPageChanged.removeRules(undefined, function () {
-//     chrome.declarativeContent.onPageChanged.addRules([
-//       {
-//         // 运行插件运行的页面URL规则
-//         conditions: [
-//           new chrome.declarativeContent.PageStateMatcher({ pageUrl: {} }),
-//         ],
-//         actions: [new window.chrome.declarativeContent.ShowPageAction()],
-//       },
-//     ]);
-//   });
-// });
-
-// chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-//   // 接受来自content-script的消息，requset里不允许传递function类型的参数
-//   chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-//     const { contentRequest } = request;
-//     // 接收来自content的api请求
-//     if (contentRequest === "apiRequest") {
-//       let { config } = request;
-//       // API请求成功的回调
-//       config.success = (data: any) => {
-//         data.result = "succ";
-//         sendResponse(data);
-//       };
-//       // API请求失败的回调
-//       config.fail = (msg: any) => {
-//         sendResponse({
-//           result: "fail",
-//           msg,
-//         });
-//       };
-//       // 发起请求
-//       apiRequest(config);
-//     }
-//   });
-//   return true;
-// });
-
 const bookmarksChangeCallback = async (): Promise<void> => {
   const treeResult = await getTree();
   uploadBookmark(treeResult);
@@ -93,3 +52,46 @@ chrome.bookmarks.onRemoved.addListener(bookmarksChangeCallback);
 // 当书签和书签夹被删除时，触发该事件。
 // 当递归删除书签夹时，只会触发一个节点删除事件，它的子节点不会触发节点删除事件。
 // chrome.bookmarks.onRemoved.addListener(function (id, removeInfo) {});
+
+/* ******************************************************************* */
+
+/*global chrome*/
+chrome.runtime.onInstalled.addListener(function () {
+  chrome.declarativeContent.onPageChanged.removeRules(undefined, function () {
+    chrome.declarativeContent.onPageChanged.addRules([
+      {
+        // 运行插件运行的页面URL规则
+        conditions: [
+          new chrome.declarativeContent.PageStateMatcher({ pageUrl: {} }),
+        ],
+        actions: [new window.chrome.declarativeContent.ShowPageAction()],
+      },
+    ]);
+  });
+});
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  // 接受来自content-script的消息，requset里不允许传递function类型的参数
+  chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+    const { contentRequest } = request;
+    // 接收来自content的api请求
+    if (contentRequest === "apiRequest") {
+      let { config } = request;
+      // API请求成功的回调
+      config.success = (data: any) => {
+        data.result = "succ";
+        sendResponse(data);
+      };
+      // API请求失败的回调
+      config.fail = (msg: any) => {
+        sendResponse({
+          result: "fail",
+          msg,
+        });
+      };
+      // 发起请求
+      // apiRequest(config);
+    }
+  });
+  return true;
+});
