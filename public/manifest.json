@@ -1,5 +1,5 @@
 {
-  "name": "Chrome插件Demo",
+  "name": "书签同步",
   "version": "1.0",
   "description": "React开发chrome插件Demo。",
   "icons": {
@@ -14,22 +14,14 @@
     "default_popup": "index.html"
   },
   "background": {
-    "scripts": [
-      "static/js/background.js"
-    ],
+    "scripts": ["static/js/background.js"],
     "persistent": false
   },
   "content_scripts": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
-      "css": [
-        "static/css/content.css"
-      ],
-      "js": [
-        "static/js/content.js"
-      ],
+      "matches": ["<all_urls>"],
+      "css": ["static/css/content.css"],
+      "js": ["static/js/content.js"],
       "run_at": "document_end"
     }
   ],

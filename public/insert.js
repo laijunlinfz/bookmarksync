@@ -1,1 +1,1 @@
-console.log('insert.js loaded')
+console.log("insert.js loaded");
