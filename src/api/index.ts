@@ -32,6 +32,6 @@ export const downloadBookmark = (): Promise<DownloadBookmarkRes> => {
 export default {
   getCode,
   login,
-  updateBookmark: uploadBookmark,
+  uploadBookmark,
   downloadBookmark,
 };

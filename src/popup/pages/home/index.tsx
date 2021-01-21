@@ -3,12 +3,14 @@ import { useHistory } from "react-router-dom";
 import { History } from "history";
 import { Button } from 'antd-mobile';
 import chromeUtils from '@/utils/chromeUtils';
+import localStorageUtils from "@/utils/localStorageUtils";
 import "./index.less";
 
 const Home: FC = () => {
   const history: History = useHistory();
 
   const logout = () => {
+    localStorageUtils.setToken('');
     history.push("/login");
   };
 

@@ -1,4 +1,5 @@
 const TOKEN = 'TOKEN';
+const EMAIL = 'EMAIL';
 
 export const setItem = <T>(key: string, value: T): void => {
   let v: string = "";
@@ -26,10 +27,20 @@ export const getToken = (): string => {
   return getItem(TOKEN) || '';
 };
 
+export const setEmail = (value: string): void => {
+  setItem(EMAIL, value);
+};
+
+export const getEmail = (): string => {
+  return getItem(EMAIL) || '';
+};
+
 export default {
   setItem,
   getItem,
   removeItem,
   setToken,
-  getToken
+  getToken,
+  setEmail,
+  getEmail
 };

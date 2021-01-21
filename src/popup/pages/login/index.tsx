@@ -1,11 +1,11 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { History } from "history";
 import { InputItem, Button, Toast } from "antd-mobile";
 import { isEmail } from "@/utils";
 import API from "@/api";
 import { MSG } from "@/constants";
-import { setToken } from "@/utils/localStorageUtils";
+import localStorageUtils from "@/utils/localStorageUtils";
 import { LoginDataRes } from "@/types/login";
 import "./index.less";
 
@@ -17,6 +17,13 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [code, setCode] = useState<string>("");
   const [second, setSecond] = useState<number>(0);
+
+  useEffect(() => {
+    const token = localStorageUtils.getToken();
+    if (token) {
+      history.push("/home");
+    }
+  }, [history]);
 
   const canClickCodeBtn: boolean = useMemo(() => {
     return isEmail(email) && second === 0;
@@ -63,7 +70,8 @@ const Login: React.FC = () => {
     if (apiCode === 0) {
       const { token } = data as LoginDataRes;
       // TODO update bookmark 不主动刷新
-      setToken(token);
+      localStorageUtils.setToken(token);
+      localStorageUtils.setEmail(email);
       history.push("/home");
     } else {
       Toast.show(msg || '登录异常');

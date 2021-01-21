@@ -1,25 +1,25 @@
-import { uploadBookmark } from "@/api";
+import API from "@/api";
 import { getTree } from "@/utils/chromeUtils";
-// import API from "@/api";
-// import { setToken, getToken } from "@/utils/localStorageUtils";
-// import { LoginDataRes } from "@/types/login";
+import localStorageUtils from '@/utils/localStorageUtils';
+import { LoginDataRes } from "@/types/login";
 
-// setInterval(async () => {
-//   console.log("background time ", Date.now());
-//   const token = getToken();
-//   if (token) {
-//     const loginRes = await API.login("", "", token);
-//     const { data, code } = loginRes;
-//     if (code === 0) {
-//       const { token } = data as LoginDataRes;
-//       setToken(token);
-//     }
-//   }
-// }, 1000);
+const autoLogin = async(): Promise<void> => {
+  const token = localStorageUtils.getToken();
+  const loginRes = await API.login('', '', token);
+  console.log('@@@@@ auto login res : ', loginRes);
+  const { code, data } = loginRes || {};
+  if (code === 0) {
+    const { token, email } = data as LoginDataRes;
+    localStorageUtils.setToken(token);
+    localStorageUtils.setEmail(email);
+  } else {
+    localStorageUtils.setToken('');
+  }
+};
 
 const bookmarksChangeCallback = async (): Promise<void> => {
   const treeResult = await getTree();
-  uploadBookmark(treeResult);
+  API.uploadBookmark(treeResult);
 };
 
 chrome.bookmarks.onChanged.addListener(bookmarksChangeCallback);
@@ -57,6 +57,8 @@ chrome.bookmarks.onRemoved.addListener(bookmarksChangeCallback);
 
 /*global chrome*/
 chrome.runtime.onInstalled.addListener(function () {
+  console.log('@@@@@@@@@ onInstalled');
+  autoLogin();
   chrome.declarativeContent.onPageChanged.removeRules(undefined, function () {
     chrome.declarativeContent.onPageChanged.addRules([
       {
