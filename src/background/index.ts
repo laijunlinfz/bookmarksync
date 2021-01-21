@@ -18,8 +18,11 @@ const autoLogin = async(): Promise<void> => {
 };
 
 const bookmarksChangeCallback = async (): Promise<void> => {
-  const treeResult = await getTree();
-  API.uploadBookmark(treeResult);
+  const bookmark = await getTree();
+  console.log("@@@@@ bookma : ", bookmark);
+  if (bookmark) {
+    API.uploadBookmark(JSON.stringify(bookmark));
+  }
 };
 
 chrome.bookmarks.onChanged.addListener(bookmarksChangeCallback);
