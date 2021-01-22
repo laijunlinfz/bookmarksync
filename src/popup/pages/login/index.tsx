@@ -14,7 +14,7 @@ import { ChromeEventType } from "@/types/background";
 let TIME = 120;
 let INTERVAL: NodeJS.Timeout;
 
-// test
+// test2
 const Login: React.FC = () => {
   const history: History = useHistory();
   const [email, setEmail] = useState<string>("3@qq.com");
