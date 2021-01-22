@@ -7,15 +7,17 @@ import API from "@/api";
 import { MSG } from "@/constants";
 import localStorageUtils from "@/utils/localStorageUtils";
 import { LoginDataRes } from "@/types/login";
+import chromeUtils from "@/utils/chromeUtils";
 import "./index.less";
+import { ChromeEventType } from "@/types/background";
 
 let TIME = 120;
 let INTERVAL: NodeJS.Timeout;
 
 const Login: React.FC = () => {
   const history: History = useHistory();
-  const [email, setEmail] = useState<string>("");
-  const [code, setCode] = useState<string>("");
+  const [email, setEmail] = useState<string>("3@qq.com");
+  const [code, setCode] = useState<string>("1111");
   const [second, setSecond] = useState<number>(0);
 
   useEffect(() => {
@@ -61,6 +63,19 @@ const Login: React.FC = () => {
     }
   };
 
+  const loginSucesssOp = async (loginRes: LoginDataRes): Promise<void> => {
+    const { token, bookmark: oldBookmark = '' } = loginRes as LoginDataRes || {};
+    // TODO update bookmark 不主动刷新
+    localStorageUtils.setToken(token);
+    localStorageUtils.setEmail(email);
+    // 账号初次登录，上传所有书签数据
+    if (!oldBookmark) {
+      const bookmark = await chromeUtils.getTree();
+      API.uploadBookmark(JSON.stringify(bookmark), ChromeEventType.AllTree);
+    }
+    history.push("/home");
+  };
+
   const login = async(): Promise<void> => {
     if (!canClickLoginBtn) {
       return;
@@ -68,11 +83,7 @@ const Login: React.FC = () => {
     const loginRes = await API.login(email, code, '');
     const { code: apiCode, msg, data } = loginRes || {};
     if (apiCode === 0) {
-      const { token } = data as LoginDataRes;
-      // TODO update bookmark 不主动刷新
-      localStorageUtils.setToken(token);
-      localStorageUtils.setEmail(email);
-      history.push("/home");
+      loginSucesssOp(data as LoginDataRes);
     } else {
       Toast.show(msg || '登录异常');
     }

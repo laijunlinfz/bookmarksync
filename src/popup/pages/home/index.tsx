@@ -1,9 +1,10 @@
 import React, { FC } from "react";
 import { useHistory } from "react-router-dom";
 import { History } from "history";
-import { Button } from 'antd-mobile';
+import { Button, Toast } from 'antd-mobile';
 import chromeUtils from '@/utils/chromeUtils';
 import localStorageUtils from "@/utils/localStorageUtils";
+import API from "@/api";
 import "./index.less";
 
 const Home: FC = () => {
@@ -14,9 +15,30 @@ const Home: FC = () => {
     history.push("/login");
   };
 
-  const bookmarkSynchro = async() => {
-    const result = await chromeUtils.getTree();
-    const result1 = await chromeUtils.getRecent(10);
+  const setBookmark = (bookmark: any): void => {
+    bookmark.forEach((item: any) => {
+      
+    });
+  };
+
+  const bookmarkSynchro = async(): Promise<void> => {
+    const downloadBookmarkRes = await API.downloadBookmark();
+    console.log('@@@@@ downloadBookmarkRes', downloadBookmarkRes);
+    const getTreeRes = await chromeUtils.getTree();
+    const getRecentRes = await chromeUtils.getRecent(10);
+    // const removeTreeRes = await chromeUtils.removeTree('');
+    console.log('##### getTreeRes ', getTreeRes);
+    console.log('##### getRecentRes ', getRecentRes);
+    // console.log('##### removeTreeRes ', removeTreeRes);
+    const { code, data, msg } = downloadBookmarkRes;
+    if (code === 0) {
+      const { bookmark = '' } = data || {};
+      if (bookmark && typeof bookmark === 'string') {
+        setBookmark(JSON.parse(bookmark));
+      }
+    } else {
+      Toast.show(msg || '获取书签错误');
+    }
   };
 
   return (

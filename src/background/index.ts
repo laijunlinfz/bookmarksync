@@ -1,37 +1,74 @@
 import API from "@/api";
-import { getTree } from "@/utils/chromeUtils";
-import localStorageUtils from '@/utils/localStorageUtils';
+import chromeUtils from "@/utils/chromeUtils";
+import localStorageUtils from "@/utils/localStorageUtils";
 import { LoginDataRes } from "@/types/login";
+import { ChromeEventType } from "@/types/background";
 
-const autoLogin = async(): Promise<void> => {
+const autoLogin = async (): Promise<void> => {
   const token = localStorageUtils.getToken();
-  const loginRes = await API.login('', '', token);
-  console.log('@@@@@ auto login res : ', loginRes);
+  const loginRes = await API.login("", "", token);
+  console.log("@@@@@ auto login res : ", loginRes);
   const { code, data } = loginRes || {};
   if (code === 0) {
     const { token, email } = data as LoginDataRes;
     localStorageUtils.setToken(token);
     localStorageUtils.setEmail(email);
   } else {
-    localStorageUtils.setToken('');
+    localStorageUtils.setToken("");
   }
 };
 
-const bookmarksChangeCallback = async (): Promise<void> => {
-  const bookmark = await getTree();
-  console.log("@@@@@ bookma : ", bookmark);
+// change事件只返回改变的id
+const onBookmarksChanged = async (
+  id: string,
+  changeInfo: any
+): Promise<void> => {
+  console.log("@@@@ changeData", id, changeInfo);
+  if (changeInfo) {
+    const data = { id, changeInfo };
+    API.uploadBookmark(JSON.stringify(data), ChromeEventType.Change);
+  }
+};
+
+const onCreated = async (id: string, bookmarkNode: any): Promise<void> => {
+  console.log("onCreated ---- ", id, bookmarkNode);
+  if (bookmarkNode) {
+    API.uploadBookmark(JSON.stringify(bookmarkNode), ChromeEventType.Created);
+  }
+};
+
+const onImportEnded = async (): Promise<void> => {
+  const bookmark = await chromeUtils.getTree();
   if (bookmark) {
-    API.uploadBookmark(JSON.stringify(bookmark));
+    API.uploadBookmark(JSON.stringify(bookmark), ChromeEventType.AllTree);
   }
 };
 
-chrome.bookmarks.onChanged.addListener(bookmarksChangeCallback);
-chrome.bookmarks.onChildrenReordered.addListener(bookmarksChangeCallback);
-chrome.bookmarks.onCreated.addListener(bookmarksChangeCallback);
+const onMoved = async (id: string, moveInfo: any): Promise<void> => {
+  console.log("onMoved ---- ", id, moveInfo);
+  if (moveInfo) {
+    const node = await chromeUtils.get(id);
+    const data = { id, moveInfo, node };
+    API.uploadBookmark(JSON.stringify(data), ChromeEventType.Moved);
+  }
+};
+
+const onRemoved = async (id: string, removeInfo: any): Promise<void> => {
+  console.log("onRemoved ---- ", id, removeInfo);
+  if (id) {
+    const data = { id, removeInfo };
+    API.uploadBookmark(JSON.stringify(data), ChromeEventType.Removed);
+  }
+};
+
+chrome.bookmarks.onChanged.addListener(onBookmarksChanged);
+// TODO 啥子？
+// chrome.bookmarks.onChildrenReordered.addListener(onBookmarksChanged);
+chrome.bookmarks.onCreated.addListener(onCreated);
 // chrome.bookmarks.onImportBegan.addListener(bookmarksChangeCallback);
-chrome.bookmarks.onImportEnded.addListener(bookmarksChangeCallback);
-chrome.bookmarks.onMoved.addListener(bookmarksChangeCallback);
-chrome.bookmarks.onRemoved.addListener(bookmarksChangeCallback);
+chrome.bookmarks.onImportEnded.addListener(onImportEnded);
+chrome.bookmarks.onMoved.addListener(onMoved);
+chrome.bookmarks.onRemoved.addListener(onRemoved);
 
 // 当书签或者书签夹发生改变时触发该事件。注意: 近期只有标题和url发生改变时，才触发该事件
 // chrome.bookmarks.onChanged.addListener(function (id, changeInfo) {});
@@ -60,7 +97,7 @@ chrome.bookmarks.onRemoved.addListener(bookmarksChangeCallback);
 
 /*global chrome*/
 chrome.runtime.onInstalled.addListener(function () {
-  console.log('@@@@@@@@@ onInstalled');
+  console.log("@@@@@@@@@ onInstalled");
   autoLogin();
   chrome.declarativeContent.onPageChanged.removeRules(undefined, function () {
     chrome.declarativeContent.onPageChanged.addRules([
