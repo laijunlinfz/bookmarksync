@@ -25,7 +25,7 @@ const onBookmarksChanged = async (
 ): Promise<void> => {
   console.log("@@@@ changeData", id, changeInfo);
   if (changeInfo) {
-    const data = { id, changeInfo };
+    const data = { ...changeInfo, id };
     API.uploadBookmark(JSON.stringify(data), ChromeEventType.Change);
   }
 };
@@ -47,7 +47,10 @@ const onImportEnded = async (): Promise<void> => {
 const onMoved = async (id: string, moveInfo: any): Promise<void> => {
   console.log("onMoved ---- ", id, moveInfo);
   if (moveInfo) {
-    const node = await chromeUtils.get(id);
+    let node = await chromeUtils.get(id);
+    if (Array.isArray(node) && node[0]) {
+      node = node[0];
+    }
     const data = { id, moveInfo, node };
     API.uploadBookmark(JSON.stringify(data), ChromeEventType.Moved);
   }
@@ -56,8 +59,7 @@ const onMoved = async (id: string, moveInfo: any): Promise<void> => {
 const onRemoved = async (id: string, removeInfo: any): Promise<void> => {
   console.log("onRemoved ---- ", id, removeInfo);
   if (id) {
-    const data = { id, removeInfo };
-    API.uploadBookmark(JSON.stringify(data), ChromeEventType.Removed);
+    API.uploadBookmark(JSON.stringify(removeInfo), ChromeEventType.Removed);
   }
 };
 
