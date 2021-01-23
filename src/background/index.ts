@@ -59,7 +59,8 @@ const onMoved = async (id: string, moveInfo: any): Promise<void> => {
 const onRemoved = async (id: string, removeInfo: any): Promise<void> => {
   console.log("onRemoved ---- ", id, removeInfo);
   if (id) {
-    API.uploadBookmark(JSON.stringify(removeInfo), ChromeEventType.Removed);
+    const data = { ...removeInfo, id };
+    API.uploadBookmark(JSON.stringify(data), ChromeEventType.Removed);
   }
 };
 
