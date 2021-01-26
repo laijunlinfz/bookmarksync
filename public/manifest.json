@@ -1,7 +1,7 @@
 {
   "name": "书签同步",
   "version": "1.0",
-  "description": "React开发chrome插件Demo。",
+  "description": "书签同步插件",
   "icons": {
     "16": "images/icon.png",
     "48": "images/icon.png",
@@ -10,7 +10,7 @@
   "manifest_version": 2,
   "page_action": {
     "default_icon": "images/icon.png",
-    "default_title": "React CRX",
+    "default_title": "bookmarksync",
     "default_popup": "index.html"
   },
   "background": {
