@@ -99,6 +99,21 @@ export const removeTree = (id: string): Promise<any> => {
   });
 };
 
+// export const cleanBookmark = async (): Promise<any> => {
+//   const allTree = await getTree();
+//   for (let i = 0; i < allTree.length; i++) {
+//     const { id } = allTree[i];
+//     await removeTree(id);
+//   }
+// };
+
+// // TODO
+// export const setBookmark = async (bookmark: any): Promise<any> => {
+//   for (let i = 0; i < bookmark.length; i++) {
+//     const { id, children, title, url } = bookmark[i];
+//   }
+// };
+
 export default {
   getTree,
   getSubTree,
@@ -111,4 +126,6 @@ export default {
   update,
   remove,
   removeTree,
+  // cleanBookmark,
+  // setBookmark
 };

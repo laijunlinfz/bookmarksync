@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 import { History } from "history";
 import { Button, Toast } from 'antd-mobile';
 import chromeUtils from '@/utils/chromeUtils';
+import { merge } from '@/utils/treeUtils';
 import localStorageUtils from "@/utils/localStorageUtils";
 import API from "@/api";
 import "./index.less";
@@ -15,13 +16,42 @@ const Home: FC = () => {
     history.push("/login");
   };
 
-  const setBookmark = (bookmark: any): void => {
-    bookmark.forEach((item: any) => {
-      
-    });
+  const setBookmark = async (cloudBookmark: any[]): Promise<void> => {
+    if (!cloudBookmark || cloudBookmark.length === 0) {
+      return;
+    }
+    const localBookmark = await chromeUtils.getTree();
+    const recentBookmark = await chromeUtils.getRecent(30);
+    const { delList, updateList, createList, createCloudList } = merge(localBookmark, cloudBookmark, recentBookmark);
+    for (let i = 0; i < delList.length; i++) {
+      await chromeUtils.remove(delList[i]);
+    }
+    for (let i = 0; i < updateList.length; i++) {
+      const { id, title, url } = updateList[i];
+      await chromeUtils.update(id, { title, url });
+    }
+    const createBookmark = (book: any): void => {
+      const { children, title = '', url = '', index = 0, parentId } = book;
+      const param = { title, index, parentId, url };
+      !param.url && delete param['url'];
+      chromeUtils.create(param);
+      if (children && Array.isArray(children)) {
+        for (let i = 0; i < children.length; i++) {
+          if (children[i]) {
+            createBookmark(children[i]);
+          }
+        }
+      }
+    }
+    for (let i = 0; i < createList.length; i++) {
+      const item = createList[i];
+      item && createBookmark(item);
+    }
+    // await chromeUtils.cleanBookmark();
+    // await chromeUtils.setBookmark(bookmark);
   };
 
-  const bookmarkSynchro = async(): Promise<void> => {
+  const bookmarkSynchro = async (): Promise<void> => {
     const downloadBookmarkRes = await API.downloadBookmark();
     console.log('@@@@@ downloadBookmarkRes', downloadBookmarkRes);
     const getTreeRes = await chromeUtils.getTree();
