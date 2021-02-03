@@ -7,8 +7,11 @@ let updateList: any[] = [];
 let createList: any[] = [];
 let createCloudList: any[] = [];
 
-const checkDelList = (itemLocal: any, cloudList: any[], recentBookmark: any[]): void => {
-  const { id } = itemLocal;
+const checkDelList = (itemLocal: any, cloudList: any[] = [], recentBookmark: any[] = []): void => {
+  const { id = '' } = itemLocal || {};
+  // console.log('itemLocal --- ', itemLocal);
+  // console.log('cloudList --- ', cloudList);
+  // console.log('recentBookmark --- ', recentBookmark);
   if (!cloudList.some((c) => c.id === id)) {
     if (recentBookmark.some((r) => r.id === id)) {
       createCloudList.push(itemLocal);

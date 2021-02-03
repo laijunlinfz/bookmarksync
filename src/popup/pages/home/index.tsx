@@ -22,30 +22,35 @@ const Home: FC = () => {
     }
     const localBookmark = await chromeUtils.getTree();
     const recentBookmark = await chromeUtils.getRecent(30);
-    const { delList, updateList, createList, createCloudList } = merge(localBookmark, cloudBookmark, recentBookmark);
+    // TODO createCloudList同步到服务器
+    const result = merge(localBookmark, cloudBookmark, recentBookmark);
+    console.log('result ------ ', JSON.stringify(result));
+    const { delList, updateList, createList, createCloudList } = result || {}; 
+
     for (let i = 0; i < delList.length; i++) {
-      await chromeUtils.remove(delList[i]);
+      const delId = delList[i];
+      delId && await chromeUtils.remove(delId);
     }
     for (let i = 0; i < updateList.length; i++) {
       const { id, title, url } = updateList[i];
       await chromeUtils.update(id, { title, url });
     }
-    const createBookmark = (book: any): void => {
+    const createBookmark = async (book: any): Promise<void> => {
       const { children, title = '', url = '', index = 0, parentId } = book;
       const param = { title, index, parentId, url };
       !param.url && delete param['url'];
-      chromeUtils.create(param);
+      await chromeUtils.create(param);
       if (children && Array.isArray(children)) {
         for (let i = 0; i < children.length; i++) {
           if (children[i]) {
-            createBookmark(children[i]);
+            await createBookmark(children[i]);
           }
         }
       }
     }
     for (let i = 0; i < createList.length; i++) {
       const item = createList[i];
-      item && createBookmark(item);
+      item && await createBookmark(item);
     }
     // await chromeUtils.cleanBookmark();
     // await chromeUtils.setBookmark(bookmark);
